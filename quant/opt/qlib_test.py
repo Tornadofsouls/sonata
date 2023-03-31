@@ -3,6 +3,8 @@ import sys
 import os
 import pandas
 import qlib
+from qlib.data import D
+from qlib.data.base import Feature
 from qlib.data.dataset.loader import QlibDataLoader
 from qlib.data.dataset.loader import StaticDataLoader
 from qlib.data.dataset.handler import DataHandlerLP
@@ -25,8 +27,8 @@ from quotation.quotation import Quotation
 
 def test():
     ### QlibDataLoader
-    provider_uri = '/Users/zhangyunsheng/Dev/sonata/data/qlib'  # target_dir
-    qlib.init(provider_uri=provider_uri, region=REG_CN)
+    #provider_uri = '/Users/zhangyunsheng/Dev/sonata/data/qlib'  # target_dir
+    #qlib.init(provider_uri=provider_uri, region=REG_CN)
     qdl = QlibDataLoader(config=(['$close', '$high'], ['close', 'high']))
     #d = qdl.load(instruments=['000001'], start_time='20210101', end_time='20230101')
     #print(d)
@@ -304,8 +306,26 @@ def analysis():
     # risk analysis
     analysis_position.risk_analysis_graph(analysis_df, report_normal_df)
 
+def myqlib():
+    provider_uri = '/Users/zhangyunsheng/Dev/sonata/data/myqlib'  # target_dir
+    qlib.init(provider_uri=provider_uri, region=REG_CN)
+    qdl = QlibDataLoader(config=(['$close', '$high'], ['close', 'high']))
+    d = qdl.load(instruments=['sz000001'], start_time='20210101', end_time='20230101')
+    print(d)
+    ## 指数数据，多线程加载必须放在if __name__ == '__main__': 内
+    d = qdl.load(instruments='csitest', start_time='20180101', end_time='20180107')
+    print(d)
 
+    d = D.calendar(start_time='2010-01-01', end_time='2017-12-31', freq='day')
+    print(d)
+    instruments = D.instruments(market='csitest')
+    d = D.list_instruments(instruments=instruments, start_time='2010-01-01', end_time='2017-12-31', as_list=True)
+    print(d)
 
+    instruments = ['sz000001']
+    fields = ['$close', '$volume', 'Ref($close, 1)', 'Mean($close, 3)', '$high-$low']
+    d = D.features(instruments, fields, start_time='2010-01-01', end_time='2017-12-31', freq='day')
+    print(d)
 
 
 if __name__ == '__main__':
@@ -313,14 +333,15 @@ if __name__ == '__main__':
     qlib.init(provider_uri=provider_uri, region=REG_CN)
 
     #test()
+    myqlib()
 
-    #provider_uri = '/Users/zhangyunsheng/Dev/sonata/data/qlib'  # target_dir
-    #qlib.init(provider_uri=provider_uri, region=REG_CN)
-    # 初始化的过程中已经完成的数据的load
-    my_feature = MyFeatureSet(instruments=['SH600006'], start_time='20180101', end_time='20200101')
-    pandas.set_option('display.max_columns', None)
-    pandas.set_option('display.max_rows', None)
-    print(my_feature.fetch().head(50))
+    ##provider_uri = '/Users/zhangyunsheng/Dev/sonata/data/qlib'  # target_dir
+    ##qlib.init(provider_uri=provider_uri, region=REG_CN)
+    ## 初始化的过程中已经完成的数据的load
+    #my_feature = MyFeatureSet(instruments=['SH600006'], start_time='20180101', end_time='20200101')
+    #pandas.set_option('display.max_columns', None)
+    #pandas.set_option('display.max_rows', None)
+    #print(my_feature.fetch().head(50))
 
     #train()
 

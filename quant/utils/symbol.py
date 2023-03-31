@@ -25,7 +25,9 @@ def symbol_of(code):
             return 'sh' + code
         elif exchange_of(code) == 'sz':
             return 'sz' + code
-        return ''
+        elif exchange_of(code) == 'bj':
+            return 'bj' + code
+        return code
 
 
 def zs_symbol_of(code):
@@ -73,16 +75,24 @@ def ne_symbol_of(code):
 def exchange_of(code):
     """
     得到证券交易所
+    【1】沪市：主板600xxx、601xxx、603xxx、605xxx、科创板688xxx。
+    【2】深市：主板000001-004999（原中小板”002001-004999“自2021年4月6日由主板使用）、创业板30xxxx;退市板块400xxx，新三板43xxxx、83xxxx、87xxxx;
+    【3】北交所：股票首两位代码一般以43、83、87、88等开头。
+    【4】B股：上海900xxx、深圳200xxx、退市板块420xxx。
     """
     if code in SH_INDEX_LIST:
         return 'sh'
     if code in SZ_INDEX_LIST:
         return 'sz'
-    if code[:1] in ['5', '6', '9', '2']:
-        return 'sh'
     if len(code) != 6:
         return ''
-    return 'sz'
+    if code[:1] in ['5', '6', '9', '2']:
+        return 'sh'
+    if code[:1] in ['4', '8']:
+        return 'bj'
+    if code[:1] in ['0', '3']:
+        return 'sz'
+    return ''
 
 
 def code_of(code):

@@ -3,9 +3,12 @@
 
 import sys
 import os
+import traceback
+
 import akshare as ak
 from akshare import stock_zh_a_daily
 import pandas as pd
+import numpy as np
 import requests
 import json
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/..')
@@ -23,28 +26,62 @@ class AkshareQuotation():
     def get_daily_data(self, code, expire=60*6):
         """
         获取一支股票所有历史数据保存到本地
+        目标地址: https://finance.sina.com.cn/realstock/company/sh600006/nc.shtml(示例)
         """
         UT.check_dir(CT.DAILY_DIR)
-        file_path = CT.DAILY_DIR + code
+        symbol = self._code_to_symbol(code)
+        file_path = "%s%s%s" % (CT.DAILY_DIR, symbol, CT.FILE_SUFFIX)
         expired = UT.check_file_expired(file_path, expire)
 
         if expired or not os.path.exists(file_path):
-            symbol = self._code_to_symbol(code)
             start_date = CT.START
             end_date = date_time.get_today_str()
-            adjust = 'qfq'
+            # adjust = 'qfq'
+            adjust = 'hfq'
+            d = None
             if is_index(code):
                 d = ak.stock_zh_index_daily(symbol)
             else:
-                d = ak.stock_zh_a_daily(symbol, start_date, end_date, adjust)
+                print(symbol, start_date, end_date, adjust)
+                try:
+                    d = ak.stock_zh_a_daily(symbol, start_date, end_date, adjust)
+                except Exception as e:
+                    print("get_daily_data exception, code=%s, e=%s, %s" % (code, repr(e), traceback.format_exc()))
+                    #print(traceback.format_exc())
+                #d = ak.stock_zh_a_hist(code, 'daily', start_date, end_date, adjust)
             if d is None:
                 return d
-            d.to_csv(file_path, sep='\t')
+            # d.to_csv(file_path, sep='\t')
+            d.to_csv(file_path, sep=CT.COLUMN_SEP)
 
         if not os.path.exists(file_path):
             return None
         #d = pd.read_csv(file_path, sep='\t', index_col=0)
-        d = pd.read_csv(file_path, sep='\t', skiprows=0, parse_dates=True, header=0, index_col=0)
+        #d = pd.read_csv(file_path, sep='\t', skiprows=0, parse_dates=True, header=0, index_col=0)
+        d = pd.read_csv(file_path, sep=CT.COLUMN_SEP, skiprows=0, parse_dates=True, header=0, index_col=0)
+        return d
+
+    def get_spot_data(self,  expire=60*6):
+        """
+        次返回所有沪深京 A 股上市公司的实时行情数据
+        http://quote.eastmoney.com/center/gridlist.html#hs_a_board
+        """
+        UT.check_dir(CT.BASICS_DIR)
+        file_path = "%s%s%s" % (CT.BASICS_DIR, CT.SPOT_FILE, CT.FILE_SUFFIX)
+        expired = UT.check_file_expired(file_path, expire)
+
+        if expired or not os.path.exists(file_path):
+            d = ak.stock_zh_a_spot_em()
+            if d is None:
+                return d
+            # d.to_csv(file_path, sep='\t')
+            d.to_csv(file_path, sep=CT.COLUMN_SEP)
+
+        if not os.path.exists(file_path):
+            return None
+        # d = pd.read_csv(file_path, sep='\t', index_col=0)
+        # d = pd.read_csv(file_path, sep='\t', skiprows=0, parse_dates=True, header=0, index_col=0)
+        d = pd.read_csv(file_path, dtype={"代码": np.string_}, sep=CT.COLUMN_SEP, skiprows=0, parse_dates=True, header=0, index_col=0)
         return d
 
     #def get_daily_data(self, code, start_date='', end_date='', adjust='qfq'):
@@ -178,10 +215,14 @@ class AkshareQuotation():
 
 def main(argv):
     q = AkshareQuotation()
-    r = q.get_daily_data('000001')
-    print(r)
+
+    #r = q.get_daily_data('000001')
+    #print(r)
     #r = q.get_daily_data('sh')
     #print(r)
+
+    r = q.get_spot_data()
+    print(r)
 
     #r = q.get_minute_data('000001')
     #print(r)
@@ -190,7 +231,7 @@ def main(argv):
     #r = q.get_minute_data('sh')
     #print(r)
 
-    #r = q.get_tick_data('000001', '2020-12-03')
+    #r = q.get_tick_data('000001', '2023-02-09')
     #print(r)
 
 if __name__ == '__main__':

@@ -48,6 +48,14 @@ class Quotation:
         d = self.akshare.get_tick_data(code, date, expire)
         return d
 
+    def get_spot_data(self,  expire=60*6):
+        """
+        次返回所有沪深京 A 股上市公司的实时行情数据
+        http://quote.eastmoney.com/center/gridlist.html#hs_a_board
+        """
+        d = self.akshare.get_spot_data(expire)
+        return d
+
     #def get_one_realtime_quotes(self, code):
     #    """
     #    获取当前行情
@@ -133,10 +141,13 @@ def main(argv):
     #print((d.df))
 
     d = q.get_daily_data('000001')
+    d = q.get_daily_data('601328')
+    d = q.get_daily_data('601288')
+    d = q.get_daily_data('002254')
     print(d)
-    d = q.get_tick_data('000001', '2020-12-02')
-    print(d)
-    print((len(d)))
+    #d = q.get_tick_data('000001', '2020-12-02')
+    #print(d)
+    #print((len(d)))
 
     ##d = q.get_one_realtime_quotes('131800')
     ##for (k,v) in list(d.items()):

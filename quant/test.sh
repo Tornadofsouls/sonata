@@ -35,13 +35,22 @@
 #/usr/local/Cellar/python@3.8/3.8.5/bin/python3
 #/usr/local/bin/qrun
 
-python3 -m opt.qlib_test
+#python3 -m opt.qlib_test
 #/usr/local/Cellar/python@3.8/3.8.5/bin/python3 -m opt.qlib_test
 
 #python3 ../opt/qlib/scripts/dump_bin.py dump_all --csv_path ../data/daily --qlib_dir ../data/qlib --include_fields open,close,high,low
+#python3 ../opt/qlib/scripts/dump_bin.py dump_all --csv_path ../data/daily --qlib_dir ../data/myqlib
+#python3 ../opt/qlib/scripts/dump_bin.py dump_update --csv_path ../data/daily --qlib_dir ../data/myqlib --exclude_fields date,symbol
+#python3 ../opt/qlib/scripts/dump_bin.py dump_update --csv_path ../data/daily --qlib_dir ../data/myqlib 
+#python3 ../opt/qlib/scripts/dump_bin.py dump_fix --csv_path ../data/daily --qlib_dir ../data/myqlib
 #python3 ../opt/qlib/scripts/get_data.py qlib_data --target_dir ../data/qlib --region cn
 #python3 -m analysis.change_analysis
+
+## analysis
 #cd analysis
-#python3 -m change_analysis
+#python3 -m volume_analysis
+python3 -m analysis.gen_portfolio
+#python3 -m analysis.get_history -m code -c 689009
+#python3 -m analysis.get_history -m all -i 0 -t 1000
 
 

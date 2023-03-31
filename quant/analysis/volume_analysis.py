@@ -8,6 +8,7 @@ import qlib
 from qlib.backtest import executor, backtest
 from qlib.backtest.decision import TradeDecisionWO, OrderDir, Order
 from qlib.backtest.position import Position
+from qlib.contrib.evaluate import risk_analysis
 from qlib.contrib.strategy import TopkDropoutStrategy
 from qlib.contrib.strategy.signal_strategy import BaseSignalStrategy
 from qlib.data.dataset import DatasetH
@@ -163,39 +164,18 @@ class VolumeStrategy(BaseSignalStrategy):
         return TradeDecisionWO(sell_order_list + buy_order_list, self)
 
 def analysis():
-    #data_handler_config = {
-    #    "start_time": "2015-01-01",
-    #    "end_time": "2020-03-31",
-    #    "fit_start_time": "2015-01-01",
-    #    "fit_end_time": "2019-03-31",
-    #    "instruments": "SH600006",
-    #}
-    #dataset_config = {
-    #    #"class": "ChangeFeature",
-    #    #"module_path": "qlib.data.dataset",
-    #    "kwargs": {
-    #        "handler": {
-    #            "class": "Alpha158",
-    #            "module_path": "qlib.contrib.data.handler",
-    #            "kwargs": data_handler_config,
-    #        },
-    #        "segments": {
-    #            "train": ("2015-01-01", "2015-03-31"),
-    #            "valid": ("2019-01-01", "2019-03-31"),
-    #            "test": ("2020-01-01", "2020-03-31"),
-    #        },
-    #    },
-    #}
-    #dataset = init_instance_by_config(dataset_config)
+    instruments = ['SH601328']
+    benchmark = ['SH601328']
+    segments = {
+        "train": ("2015-01-01", "2015-03-31"),
+        "valid": ("2019-01-01", "2019-03-31"),
+        "test": ("2015-01-01", "2022-12-31")}
 
-    feature = VolumeFeature(instruments=['SH601288'], start_time='20180101', end_time='20200331',
-                            fit_start_time="20150101", fit_end_time="20190331")
+    feature = VolumeFeature(instruments=instruments, start_time=segments["train"][0], end_time=segments['test'][1],
+                            fit_start_time=segments["train"][0], fit_end_time=segments["valid"][1])
     ds = DatasetH(handler=feature,
                   step_len=40,
-                  segments={
-                            "train": ("2015-01-01", "2015-03-31"),
-                            "valid": ("2019-01-01", "2019-03-31"),
-                            "test": ("2020-01-01", "2020-03-31")})
+                  segments=segments)
     model = VolumeModel()
     # 需要加入自定义路径
     # export PYTHONPATH="/Users/zhangyunsheng/Dev/sonata/quant"
@@ -211,16 +191,16 @@ def analysis():
             }
         },
         "backtest": {
-            "start_time": "2020-01-01",
-            "end_time": "2020-03-31",
+            "start_time": segments["test"][0],
+            "end_time": segments["test"][1],
             "account": 100000000,
-            "benchmark": ['SH601288'],
+            "benchmark": benchmark,
             "exchange_kwargs": {
                 "freq": "day",
                 "limit_threshold": 0.095,
                 "deal_price": "close",
-                "open_cost": 0.0005,
-                "close_cost": 0.0015,
+                "open_cost": 0.0002,
+                "close_cost": 0.0002,
                 "min_cost": 5,
             },
         },
@@ -256,10 +236,23 @@ def analysis():
     fig_list = analysis_position.report_graph(report_normal_df, show_notebook=False)
     for fig in fig_list:
         fig.show()
+    #analysis = dict()
+    #analysis["excess_return_without_cost"] = risk_analysis(
+    #    report_normal_df["return"] - report_normal_df["bench"], freq=analysis_freq
+    #)
+    #analysis["excess_return_with_cost"] = risk_analysis(
+    #    report_normal_df["return"] - report_normal_df["bench"] - report_normal_df["cost"], freq=analysis_freq
+    #)
+
+    #analysis_df = pd.concat(analysis)  # type: pd.DataFrame
+    #risk_fig_list = analysis_position.risk_analysis_graph(analysis_df, report_normal_df, show_notebook=False)
+    #for fig in risk_fig_list:
+    #    fig.show()
 
 
 if __name__ == '__main__':
-    provider_uri = '/Users/zhangyunsheng/Dev/sonata/data/qlib'  # target_dir
+    #provider_uri = '/Users/zhangyunsheng/Dev/sonata/data/qlib'  # target_dir
+    provider_uri = '/Users/zhangyunsheng/Dev/sonata/data/myqlib'  # target_dir
     qlib.init(provider_uri=provider_uri, region=REG_CN)
 
     ## 初始化的过程中已经完成的数据的load

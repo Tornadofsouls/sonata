@@ -28,22 +28,28 @@ def get_h_data_mul(index, thread):
     """
     获取所有股票的历史数据
     """
-    symbols = open(CT.BASICS_DIR + 'symbols.csv')
-    symbols_list = []
-    for c in symbols:
-        symbols_list.append(c.strip())
+    q = Quotation()
+    spot_data = q.get_spot_data()
+    codes = spot_data["代码"]
+    print(codes)
+
+    sep_list_len = int((codes.count() + thread -1)/thread)
+
+    #codes = open(CT.BASICS_DIR + 'codes.csv')
+    #codes_list = []
+    #for c in codes:
+    #    codes_list.append(c.strip())
 
 
-    sep_list_len = (len(symbols_list) + thread -1)/thread
+    #sep_list_len = (len(codes_list) + thread -1)/thread
 
     start = sep_list_len * index
     end = sep_list_len * (index + 1)
-    sep_symbols_list = symbols_list[start:end]
-    #print sep_symbols_list
-    for c in sep_symbols_list:
+    sep_codes_list = codes[start:end]
+    print(sep_codes_list)
+    for c in sep_codes_list:
         global g_expire
-        q = Quotation()
-        q.get_h_data(c, g_expire)
+        q.get_daily_data(c, g_expire)
 
 def help():
     print(( '''
@@ -51,15 +57,15 @@ def help():
         -f,--force	强制更新
         -i,--index	线程索引
         -t,--thread	总线程数
-        -s,--symbol	股票代码
+        -s,--code	股票代码
         -a,--date	日期 1900-01-01
         -h,--help	查看用法
-        -m.--mode	mode[all,symbol]
+        -m.--mode	mode[all,code]
         --------
         获取所有股票的历史数据:
         python get_history.py -m all -i i -t HIS_THRD_CNT &
         获取指定股票历史数据:
-        python get_history.py -m symbol -s $1
+        python get_history.py -m code -s $1
     '''.encode('utf-8')));
     return
 
@@ -69,7 +75,7 @@ def main(argv):
     #print d
     #return
     try:
-        opts, args = getopt.getopt(argv[1:], "dhe:m:i:t:s:a:")
+        opts, args = getopt.getopt(argv[1:], "dhe:m:i:t:c:a:")
     except getopt.GetoptError as err:
         print(err)
         return -1
@@ -77,7 +83,7 @@ def main(argv):
     mode = ''
     index = 0
     thread = 1
-    symbol = '000000'
+    code = '000000'
     date = date_time.get_today_str()
     for ok, ov in opts:
         if ok in ('-d', '--debug'):
@@ -91,8 +97,8 @@ def main(argv):
             index = int(ov)
         if ok in ('-t', '--thread'):
             thread = int(ov)
-        if ok in ('-s', '--symbol'):
-            symbol = ov
+        if ok in ('-c', '--code'):
+            code = ov
         if ok in ('-a', '--date'):
             date = ov
         if ok in ('-h', '--help'):
@@ -105,14 +111,14 @@ def main(argv):
             filename=CT.LOG_DIR + 'get_history.log',
             filemode='a')
 
-    log_str = 'running model[%s] index[%d] thread[%d] symbol[%s] date[%s]' %(mode, index, thread, symbol, date)
+    log_str = 'running model[%s] index[%d] thread[%d] code[%s] date[%s]' %(mode, index, thread, code, date)
     print(log_str)
     logging.info(log_str)
     if mode == 'all':
         get_h_data_mul(index, thread)
-    elif mode == 'symbol':
+    elif mode == 'code':
         q = Quotation()
-        q.get_h_data(symbol, g_expire)
+        q.get_daily_data(code, g_expire)
     else:
         print(('args err mode[%s]' %(mode)))
         logging.error('args err mode[%s]' %(mode))
