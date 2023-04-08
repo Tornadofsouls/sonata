@@ -218,11 +218,11 @@ def main(argv):
 
     #r = q.get_daily_data('000001')
     #print(r)
-    #r = q.get_daily_data('sh')
-    #print(r)
-
-    r = q.get_spot_data()
+    r = q.get_daily_data('sh')
     print(r)
+
+    #r = q.get_spot_data()
+    #print(r)
 
     #r = q.get_minute_data('000001')
     #print(r)

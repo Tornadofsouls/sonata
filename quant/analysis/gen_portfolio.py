@@ -10,7 +10,7 @@ from qlib.data import D
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/..')
 from quotation.quotation import Quotation
-from utils.symbol import symbol_of, is_index
+from utils.symbol import upper_symbol_of
 import utils.const as CT
 import utils.date_time as date_time
 from utils import utils as UT
@@ -43,8 +43,8 @@ def gen_analysis_portfolio():
     """ 过滤无数据 """
     portfolio_symbol_list = []
     all_instruments = get_all_instruments()
-    for symbol in spot_data["代码"].apply(symbol_of).to_list():
-        if symbol.upper() in all_instruments:
+    for symbol in spot_data["代码"].apply(upper_symbol_of).to_list():
+        if symbol in all_instruments:
             portfolio_symbol_list.append(symbol)
 
     for symbol in portfolio_symbol_list:

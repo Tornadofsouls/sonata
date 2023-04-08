@@ -14,6 +14,7 @@ MODEL_DIR = HOME + 'data/model/'
 LOG_DIR = HOME + 'log/'
 CONF_DIR = HOME + 'conf/'
 PORTFOLIO_CONF_DIR = CONF_DIR + 'portfolio/'
+ANALYSIS_DIR = HOME + 'analysis/'
 MY_QLIB_DIR = HOME + 'data/myqlib/'
 MY_QLIB_INSTRUMENTS_DIR = MY_QLIB_DIR + 'instruments/'
 

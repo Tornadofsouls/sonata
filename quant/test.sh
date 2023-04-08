@@ -48,8 +48,9 @@
 
 ## analysis
 #cd analysis
-#python3 -m volume_analysis
-python3 -m analysis.gen_portfolio
+#python3 -m analysis.volume_analysis
+python3 -m analysis.sort_demonstration
+#python3 -m analysis.gen_portfolio
 #python3 -m analysis.get_history -m code -c 689009
 #python3 -m analysis.get_history -m all -i 0 -t 1000
 

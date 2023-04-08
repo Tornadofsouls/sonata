@@ -16,6 +16,7 @@ class Logger:
     LOGGER_WARN = 'warn'
     LOGGER_TRADE = 'trade'
     LOGGER_SMTP = 'smtp'
+    LOGGER_ANALYSIS = 'analysis'
 
     __instance = None
     log_conf = CT.CONF_DIR + "logger.conf"
@@ -67,6 +68,12 @@ class Logger:
         logging.getLogger(Logger.LOGGER_SMTP).warning(message)
         return 0
 
+    @staticmethod
+    def analysis(message):
+        """分析日志"""
+        Logger.get_instance()
+        logging.getLogger(Logger.LOGGER_ANALYSIS).info(message)
+        return 0
 
 def main(argv):
     Logger.quant('quant log test')

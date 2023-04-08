@@ -29,6 +29,11 @@ def symbol_of(code):
             return 'bj' + code
         return code
 
+def upper_symbol_of(code):
+    """
+    生成symbol代码标志
+    """
+    return symbol_of(code).upper()
 
 def zs_symbol_of(code):
     """

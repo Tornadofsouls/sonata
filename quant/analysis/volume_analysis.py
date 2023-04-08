@@ -105,6 +105,7 @@ class VolumeStrategy(BaseSignalStrategy):
         if pred_score is None:
             return TradeDecisionWO([], self)
         code = pred_score.keys()[0]
+        print("code: ", code)
         pred = pred_score.item()
 
         current_temp: Position = copy.deepcopy(self.trade_position)
@@ -147,7 +148,7 @@ class VolumeStrategy(BaseSignalStrategy):
                     stock_id=code, start_time=trade_start_time, end_time=trade_end_time, direction=OrderDir.BUY
                 )
                 print("buy_price: ", buy_price)
-                buy_amount = cash / buy_price
+                buy_amount = int(cash / buy_price)
                 factor = self.trade_exchange.get_factor(stock_id=code, start_time=trade_start_time,
                                                         end_time=trade_end_time)
                 buy_amount = self.trade_exchange.round_amount_by_trade_unit(buy_amount, factor)
@@ -169,7 +170,7 @@ def analysis():
     segments = {
         "train": ("2015-01-01", "2015-03-31"),
         "valid": ("2019-01-01", "2019-03-31"),
-        "test": ("2015-01-01", "2022-12-31")}
+        "test": ("2022-01-01", "2022-12-31")}
 
     feature = VolumeFeature(instruments=instruments, start_time=segments["train"][0], end_time=segments['test'][1],
                             fit_start_time=segments["train"][0], fit_end_time=segments["valid"][1])
@@ -230,6 +231,7 @@ def analysis():
     print("analysis_freq:", analysis_freq)
     # backtest info
     report_normal_df, positions_normal = portfolio_metric_dict.get(analysis_freq)
+    report_normal_df.to_csv('/Users/zhangyunsheng/Dev/sonata/quant/t', sep='\t')
     print("report_normal_df:", report_normal_df)
     print("positions_normal:", positions_normal)
     print("qcr.GRAPH_NAME_LIST:", qcr.GRAPH_NAME_LIST)
